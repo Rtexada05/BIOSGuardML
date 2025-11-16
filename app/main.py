@@ -1,11 +1,29 @@
+# app/main.py
+
 from fastapi import FastAPI
 
-app = FastAPI(title="BIOSGuardML", version="0.1.0")
+from app.core.config import settings
+from app.routers import health, firmware, predict, status, metadata
 
 
-@app.get("/health")
-def health_check():
+def create_app() -> FastAPI:
     """
-    Simple endpoint to verify that the service is running.
+    Application factory for BIOSGuardML.
     """
-    return {"status": "ok", "service": "BIOSGuardML"}
+    app = FastAPI(
+        title=settings.name,
+        version=settings.version,
+        description=settings.description,
+    )
+
+    # Register routers
+    app.include_router(health.router)
+    app.include_router(firmware.router)
+    app.include_router(predict.router)
+    app.include_router(status.router)
+    app.include_router(metadata.router)
+
+    return app
+
+
+app = create_app()
